@@ -1,8 +1,23 @@
 use image::GenericImageView;
 use std::fs;
+use clap::{Parser, ArgGroup};
+
+const ASCII_CHAR_ARRAY: [&str; 8] = [" ", ".", ",", "-", "~", "+", "=", "@"];
+
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+#[command(group(
+	ArgGroup::new("required")
+		.required(true)
+		.args(["file"])
+))]
+struct Args {
+	file: Option<String>,
+}
 
 fn main() {
-	let path = "test_file2.jpg";
+	let arg = Args::parse().file.unwrap();
+	let path = arg.as_str();
 	let scale = 4;
 	let output = get_image(path, scale);
 	fs::write(path.to_owned() + ".txt", output).expect("Couldn't write file");
@@ -33,6 +48,5 @@ fn get_image(path: &str, scale: u32) -> String {
 
 fn get_str_ascii(intensity: u8) -> &'static str {
 	let index = intensity / 32;
-	let ascii = [" ", ".", ",", "-", "~", "+", "=", "@"];
-	return ascii[index as usize];
+	return ASCII_CHAR_ARRAY[index as usize];
 }
